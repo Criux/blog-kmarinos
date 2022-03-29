@@ -1,0 +1,120 @@
+---
+title: 'Capstone Project: How Does a Bike-Share Navigate Speedy Success?'
+author: 'Paulina Marinos'
+date: '2022-03-15'
+tags: [data-analysis, coursera]
+output:
+  pdf_document: default
+linkcolor: blue
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Einleitung
+
+Dieser Bericht ist Teil des Abschlussprojekts des [Google-Datenanalyse Zertifikats über berufliche Qualifikation](https://www.coursera.org/professional-certificates/google-data-analytics).
+
+In dieser Fallstudie untersuchte ich Daten, die innerhalb des Kurses bereitgestellt wurden. Die folgenden Methoden wurden verwendet:
+
+- Microsoft Excel
+- PostgreSQL
+- Tableau Public
+- RMarkdown
+
+Die Daten befinden sich [hier](https://divvy-tripdata.s3.amazonaws.com/index.html) unter [dieser Lizenz](https://ride.divvybikes.com/data-license-agreement).
+
+## Kontext
+
+Die bereitgestellten Daten zeigen Fahrrad-Touren von Nutzern einer Bike-Sharing-App im Jahr 2021 in Chicago. Diese Daten stammen ursprünglich vom Unternehmen Divvy und wurden hier verwendet, um das fiktive Unternehmen _Cyclistic_ zu kreieren.
+
+Hier ist ein Einblick in die Daten:
+
+![all_columns](/static/images/screens/allcolumns.jpg)
+
+Diese Daten sind öffentlich, aktuell und enthalten keine persönlichen Daten der Nutzer.
+
+## Ziel der Analyse
+
+Das Ziel dieser Analyse ist, herauszufinden, wie sich Gelegenheitsnutzer dieser App von Abonnement-Mitgliedern in ihrer Nutzung der Fahrräder unterscheiden. Das übergeordnete Ziel ist, mehr Nutzer dazu zu bewegen, ein Abonnement abzuschließen. Basierend auf den Einblicken durch die Datenanalyse sollen Handlungsempfehlungen formuliert und präsentiert werden.
+
+## Datenaufbereitung
+
+Um einen besseren Überblick über die bereitgestellten Daten zu bekommen, importierte ich zunächst die CSV-Dateien der einzelnen Monate in ein Excel Workbook. Dort überprüfte ich, ob die Daten vollständig sind und die relevanten Spalten keine leeren Felder aufweisen.
+
+Danach führte ich einige Berechnungen durch, wie z. B. die durchschnittliche und maximale Länge einer Fahrt, abhängig vom Nutzertyp. Dabei fielen mir einige Ausreißer auf. Diese Ausreißer sind nur bei Gelegenheitsnutzern zu finden und zeigen eine Fahrtlänge von mehreren Tagen. Im Februar beispielsweise, dem Monat mit den wenigsten Fahrten, liegt die durchschnittliche Fahrtlänge bei 50 Minuten und 45 Sekunden. Dort sind zwei Ausreißer mit einer Fahrtdauer von fast 21 Tagen zu finden.
+
+![](/static/images/screens/OutliersFebruary.jpg)
+
+Ohne diese Ausreißer beträgt die durchschnittliche Fahrtdauer im Februar für Gelegenheitsnutzer 44 Minuten und 9 Sekunden. Es gibt zahlreiche mögliche Erklärungen für diese Ausreißer, unter anderem einen Software-Fehler, sodass die korrekte Fahrtdauer nicht berechnet werden konnten, oder auch einen Fehler durch den Nutzer, indem er z. B. vergessen hat, sich auszuloggen, oder eine tatsächlich längere Nutzung des Fahrrads und damit der App.
+
+Ich habe mich aus folgenden Gründen entschlossen, die Ausreißer nicht auszuschließen:
+
+1.  Der Unterschied innerhalb der Gruppe der Gelegenheitsnutzer ist auch ohne Ausreißer nicht sehr groß.
+2.  Eine definitive Erklärung für die Ausreißer ist nicht vorhanden und könnte daher zum gewöhnlichen Nutzerverhalten gehören.
+3.  In den Sommermonaten ist die Anzahl der Ausreißer so groß, dass der Begriff „Ausreißer" nicht mehr zutreffend ist und keine klare Linie mehr gezogen werden kann zwischen „plausiblem" Nutzerverhalten und Ausreißern.
+
+\newpage
+
+Zum Vergleich ein Blick auf Juli 2021, den Monat mit den meisten Fahrten:
+
+![](/static/images/screens/OutliersJuly.jpg)
+
+Da die einzelnen extremen Schwankungen in der Fahrtdauer den Durchschnitt nicht sehr stark beeinflussen, entschied ich mich dazu, die durchschnittlichen Fahrtlängen der Nutzertypen pro Monat und Wochentag zu betrachten. Zusätzlich empfand ich die Anzahl der Fahrten als relevant zur Beantwortung der Frage, wie sich die Nutzertypen in ihrem Verhalten unterscheiden.
+
+Für diese Analyse erstellte ich Tabellen mithilfe von PostgreSQL und exportierte diese Tabellen zur Visualisierung in Tableau Public.
+
+```sql
+SELECT
+member_casual,
+AVG(ended_at - started_at) as avg_ride_length,
+count(*) as num_of_rides,
+to_char(started_at, 'Month') as "month",
+to_char(started_at, 'Day') as "day"
+FROM
+data_2021 d
+GROUP BY
+member_casual,
+to_char(started_at, 'Month'),
+to_char(started_at, 'Day')
+```
+
+![](/static/images/screens/relevantdata.jpg)
+
+## Analyse
+
+![](/static/images/screens/nummonthday.jpg){width="90%"}
+
+Anhand der Ergebnisse der Datenverarbeitung ließen sich folgende Ergebnisse feststellen:
+
+1.  Gelegenheitsnutzer (casual) fuhren öfter am Wochenende und Abonnement-Mitglieder (member) fuhren öfter an Werktagen
+
+![](/static/images/screens/numday.jpg){width="40%"}
+
+2.  Gelegenheitsnutzer fuhren an allen Tagen länger als Abonnement-Mitglieder
+
+![](/static/images/screens/lengthday.jpg){width="50%"}
+
+3.  Sowohl Gelegenheitsnutzer als auch Abonnement-Mitglieder fuhren in den warmen Monaten häufiger
+
+![](/static/images/screens/nummonth.jpg){width="50%"}
+
+Die Ergebnisse legen die Vermutung nahe, dass Gelegenheitsnutzer die App eher für Freizeitbeschäftigungen nutzen und Abonnement-Mitglieder sie aus praktischen Gründen, beispielsweise für den Arbeitsweg, verwenden.
+
+## Fehlende Daten
+
+Um eine genauere Analyse des Nutzerverhaltens zu ermöglichen, wären weitere Daten vonnöten. So würde beispielsweise eine Nutzer-ID dabei helfen, die Fahrten nach Nutzer zu filtern und die Frage zu beantworten, ob es viele Gelegenheitsnutzer gibt, die von einem Jahresabonnement profitieren würden. Diese Nutzer könnten dann mithilfe zielgerichteter Anzeigen erreicht werden, wenn sie die App beispielsweise häufig an Werktagen für kurze Strecken nutzen und damit dem Profil eines Abonnement-Mitglieds ähneln.
+
+## Handlungsempfehlungen
+
+Aufgrund der vorliegenden Daten lassen sich diese wesentlichen Empfehlungen formulieren:
+
+1.  Da Gelegenheitsnutzer die App eher am Wochenende und in den warmen Monaten verwenden, wäre es nützlich, eine spezielle Art von Abonnement zu entwickeln. Dieses Abonnement könnte beispielsweise für die Tage Freitag bis Sonntag gelten und deshalb vergünstigt sein.
+2.  Um Gelegenheitsnutzer anzusprechen, wäre es sinnvoll, darauf einzugehen, warum sie die App nutzen. Da die App von diesem Nutzertyp für Freizeitbeschäftigungen genutzt wird, wäre eine Integration von Tourismus-Aktivitäten innerhalb der App von Vorteil. Diese Aktivitäten könnten beispielsweise Fahrrad-Routen, Schnitzeljadgen oder Sightseeing-Tipps beinhalten.
+3.  Um besonders viele Gelegenheitsnutzer zu erreichen, sollte die Werbung für diese Abonnement-Art in den Frühlingsmonaten beginnen und besonders freitags, samstags und sonntags in der App angezeigt werden.
+4.  Eine besondere Werbeaktion, die einen Gratismonat des Abonnements anbietet, sollte im März und April stattfinden, damit dieses Abonnement für die Gelegenheitsnutzer im kommenden Jahr besonders vorteilhaft ist.
+
+## Fazit
+
+Eine große Menge an Gelegenheitsnutzern verwendet die Dienste des Unternehmens Cyclistic. Daher gibt es einen Markt für ein spezielles Abonnement, das das Verhalten dieser Nutzer unterstützt und ihnen Vorteile bietet. Das reguläre Jahresabonnement kommt für diese Nutzer wahrscheinlich nicht in Frage, da sie die App an Werktagen und in den kalten Monaten nicht nutzen. Es wäre daher notwendig, eine neue Art des Abonnements zu entwickeln, das sich auf Wochenenden und die warmen Monate beschränkt. Dies würde die Gelegenheitsnutzer zu Langzeitmitgliedern machen und folglich eine loyale Kundenbasis erschaffen.
