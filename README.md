@@ -45,6 +45,11 @@ Feature request? Check the past discussions to see if it has been brought up pre
 - [bpiggin.com](https://www.bpiggin.com) - Ben Piggin's personal blog
 - [maqib.cn](https://maqib.cn) - A blog of Chinese front-end developers 狂奔小马的博客 ([源码](https://github.com/maqi1520/nextjs-tailwind-blog))
 - [ambilena.com](https://ambilena.com/) - Electronic Music Blog & imprint for upcoming musicians.
+- [kittan.ru](https://www.kittan.ru/) - Kittanb's personal blog about linux ([source code](https://github.com/kittanb/blog))
+- [nchristopher.me](https://nchristopher.me) - Nicholas Christopher's personal website and blog ([source code](https://github.com/nchristopher/blog))
+- [dalelarroder.com](https://dalelarroder.com) - Dale Larroder's personal website and blog
+- [devahoy.com](https://devahoy.com) - Chai's personal blog (Thai language)
+- [0xchai.io](https://0xchai.io) - Chai's personal blog
 
 Using the template? Feel free to create a PR and add your blog to this list.
 
@@ -74,7 +79,7 @@ I wanted it to be nearly as feature-rich as popular blogging templates like [bea
 - Blog templates
 - TOC component
 - Support for nested routing of blog posts
-- Newsletter component with support for mailchimp, buttondown, convertkit, klaviyo and revue
+- Newsletter component with support for mailchimp, buttondown, convertkit, klaviyo, revue, and emailoctopus
 - Supports [giscus](https://github.com/laymonage/giscus), [utterances](https://github.com/utterance/utterances) or disqus
 - Projects page
 - Preconfigured security headers
@@ -93,8 +98,8 @@ I wanted it to be nearly as feature-rich as popular blogging templates like [bea
 
 1. TypeScript and Contentlayer (alpha)
 
-```
-npx degit timlrx/tailwind-nextjs-starter-blog#contentlayer
+```bash
+npx degit 'timlrx/tailwind-nextjs-starter-blog#contentlayer'
 ```
 
 or JS (official support)
@@ -106,7 +111,7 @@ npx degit https://github.com/timlrx/tailwind-nextjs-starter-blog.git
 or with TypeScript (community support)
 
 ```bash
-npx degit timlrx/tailwind-nextjs-starter-blog#typescript
+npx degit 'timlrx/tailwind-nextjs-starter-blog#typescript'
 ```
 
 2. Personalize `siteMetadata.js` (site related information)
